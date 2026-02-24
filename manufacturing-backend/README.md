@@ -1,6 +1,6 @@
 # Manufacturing SOP Training Platform — Backend
 
-FastAPI backend for the AI-powered SOP training platform. Handles auth, document storage, AI training generation via Gemini, and employee quiz scoring.
+FastAPI backend for the AI-powered training platform. Handles auth, document storage, AI training generation via Gemini, and employee quiz scoring.
 
 ---
 
@@ -13,9 +13,9 @@ FastAPI backend for the AI-powered SOP training platform. Handles auth, document
 | Database | Neon Postgres (via SQLAlchemy 2.x) |
 | Migrations | Alembic |
 | Auth | JWT (python-jose) + bcrypt |
-| Storage | AWS S3 (disabled in dev — PDF stored in DB) |
+| Storage | AWS S3 (disabled for now — PDF stored in DB) |
 | Background jobs | RQ + Redis |
-| AI | Google Gemini 2.5 Flash (`google-genai`) |
+| AI | Google Gemini 2.5 Flash  |
 | PDF parsing | PyPDF2 |
 
 ---
@@ -159,7 +159,7 @@ curl -s -X POST http://localhost:8000/auth/register \
 ### Admin
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| POST | `/admin/documents` | Admin | Upload SOP PDF |
+| POST | `/admin/documents` | Admin | Upload PDF |
 | GET | `/admin/documents` | Admin | List all documents |
 | POST | `/admin/documents/{id}/generate-training` | Admin | Enqueue AI training generation |
 | GET | `/admin/trainings/{id}` | Admin | View training with modules + quiz |

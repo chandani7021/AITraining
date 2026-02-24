@@ -38,7 +38,7 @@ async function cancelTraining(documentId: number): Promise<void> {
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, string> = {
     uploaded: 'bg-yellow-100 text-yellow-800',
-    processing: 'bg-blue-100 text-blue-800',
+    processing: 'bg-sky-100 text-sky-800',
     training_ready: 'bg-green-100 text-green-800',
     failed: 'bg-red-100 text-red-800',
   };
@@ -113,7 +113,7 @@ export default function AdminDocuments() {
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploadMutation.isPending}
-          className="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition"
+          className="bg-sky-600 hover:bg-sky-700 disabled:opacity-60 text-white text-sm font-medium px-4 py-2.5 rounded-lg flex items-center gap-2 transition"
         >
           {uploadMutation.isPending ? 'Uploading…' : '+ Upload PDF'}
         </button>
@@ -153,7 +153,7 @@ export default function AdminDocuments() {
                 {new Date(doc.created_at).toLocaleDateString()}
               </p>
               {doc.status === 'processing' && doc.progress_message && (
-                <p className="text-xs text-blue-600 mt-1 animate-pulse">
+                <p className="text-xs text-sky-600 mt-1 animate-pulse">
                   {doc.progress_message}
                 </p>
               )}

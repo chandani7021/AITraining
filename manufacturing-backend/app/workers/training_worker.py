@@ -61,7 +61,7 @@ no extra keys, JSON only):
           {{
             "id": "q1",
             "question": "<question text>",
-            "options": ["<option A>", "<option B>", "<option C>"],
+            "options": ["<option A>", "<option B>", "<option C>", "<option D>"],
             "correct_index": 0,
             "explanation": "<why this answer is correct>"
           }}
@@ -101,7 +101,7 @@ def _chunk_text(text: str, max_chars: int = 12_000) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Gemini call
+# Gemini 2.5 
 # ---------------------------------------------------------------------------
 
 def _call_gemini(prompt: str) -> dict:

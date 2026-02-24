@@ -131,4 +131,5 @@ export interface QuizResult {
 export interface EmployeeListItem {
   id: number;
   email: string;
+  role: 'admin' | 'employee';
 }

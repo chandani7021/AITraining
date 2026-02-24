@@ -19,6 +19,7 @@ from ..config import get_settings
 from ..database import get_db
 from ..models import Document, Training, Assignment, User
 from ..schemas import (
+    AdminResetPasswordRequest,
     AssignRequest,
     AssignmentOut,
     DocumentListItem,
@@ -227,12 +228,27 @@ def assign_training(
 
 
 # ---------------------------------------------------------------------------
-# Admin user list (employees only, for assignment UI)
+# Admin user list (all users, for assignment UI and user management)
 # ---------------------------------------------------------------------------
 
 @router.get("/users", response_model=list[EmployeeListItem])
-def list_employees(
+def list_users(
     db: Session = Depends(get_db),
     current_user=Depends(require_admin),
 ):
-    return db.query(User).filter(User.role == "employee").all()
+    return db.query(User).order_by(User.role, User.email).where(User.role != "admin").all()
+
+
+@router.post("/users/{user_id}/reset-password", status_code=status.HTTP_204_NO_CONTENT)
+def reset_user_password(
+    user_id: int,
+    payload: AdminResetPasswordRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_admin),
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    from ..auth.helpers import hash_password
+    user.password_hash = hash_password(payload.new_password)
+    db.commit()

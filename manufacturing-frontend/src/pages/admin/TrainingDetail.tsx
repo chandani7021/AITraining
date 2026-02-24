@@ -60,7 +60,7 @@ export default function AdminTrainingDetail() {
   });
 
   const { data: employees = [], isLoading: loadingEmployees } = useQuery({
-    queryKey: ['admin', 'employees'],
+    queryKey: [ 'employees'],
     queryFn: fetchEmployees,
   });
 
@@ -185,7 +185,7 @@ export default function AdminTrainingDetail() {
                       type="checkbox"
                       checked={selectedEmployees.includes(emp.id)}
                       onChange={() => toggleEmployee(emp.id)}
-                      className="w-4 h-4 accent-blue-600"
+                      className="w-4 h-4 accent-sky-600"
                     />
                     <span className="text-sm text-gray-700">{emp.email}</span>
                   </label>
@@ -204,7 +204,7 @@ export default function AdminTrainingDetail() {
         <button
           onClick={() => assignMutation.mutate()}
           disabled={selectedEmployees.length === 0 || assignMutation.isPending}
-          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition"
+          className="w-full sm:w-auto bg-sky-600 hover:bg-sky-700 disabled:opacity-60 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition"
         >
           {assignMutation.isPending ? 'Assigning…' : 'Assign to selected'}
         </button>

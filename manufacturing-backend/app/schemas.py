@@ -139,11 +139,25 @@ class QuizResult(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Admin users list (for assignment UI)
+# Admin users list (for assignment UI and user management)
 # ---------------------------------------------------------------------------
 
 class EmployeeListItem(BaseModel):
     id: int
     email: str
+    role: str
 
     model_config = {"from_attributes": True}
+
+
+# ---------------------------------------------------------------------------
+# Password management
+# ---------------------------------------------------------------------------
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class AdminResetPasswordRequest(BaseModel):
+    new_password: str

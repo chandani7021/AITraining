@@ -83,9 +83,9 @@ function QuizSection({
             <div className="space-y-2">
               {q.options.map((opt, i) => {
                 let style =
-                  'border border-gray-200 text-gray-700 hover:border-blue-400 hover:bg-blue-50';
+                  'border border-gray-200 text-gray-700 hover:border-sky-400 hover:bg-sky-50';
                 if (!checked && selected === i) {
-                  style = 'border border-blue-500 bg-blue-50 text-blue-800';
+                  style = 'border border-sky-500 bg-sky-50 text-sky-800';
                 }
                 if (checked) {
                   if (i === q.correct_index) {
@@ -158,7 +158,7 @@ function StepIndicator({
               stepState(i) === 'done'
                 ? 'bg-green-500 text-white'
                 : stepState(i) === 'active'
-                ? 'bg-blue-600 text-white ring-4 ring-blue-100'
+                ? 'bg-sky-600 text-white ring-4 ring-sky-100'
                 : 'bg-gray-100 text-gray-400'
             }`}
           >
@@ -264,7 +264,7 @@ export default function EmployeeTrainingDetail() {
 
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-5">
           <div className="px-5 py-4 border-b border-gray-100 bg-gray-50">
-            <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide mb-0.5">
+            <p className="text-xs text-sky-600 font-semibold uppercase tracking-wide mb-0.5">
               Module {stage.index + 1} of {modules.length}
             </p>
             <h3 className="font-semibold text-gray-900">{mod.title}</h3>
@@ -279,7 +279,7 @@ export default function EmployeeTrainingDetail() {
 
         <button
           onClick={() => setStage({ type: 'module-quiz', index: stage.index })}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg text-sm transition"
+          className="w-full bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 rounded-lg text-sm transition"
         >
           Next: Take Module {stage.index + 1} Quiz →
         </button>
@@ -377,7 +377,7 @@ export default function EmployeeTrainingDetail() {
                   setStage({ type: 'module-content', index: stage.index + 1 });
                 }
               }}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg text-sm transition"
+              className="flex-1 bg-sky-600 hover:bg-sky-700 text-white font-semibold py-3 rounded-lg text-sm transition"
             >
               {isLastModule ? 'Next: Final Quiz →' : `Next: Module ${stage.index + 2} →`}
             </button>
@@ -431,7 +431,7 @@ export default function EmployeeTrainingDetail() {
             <button
               onClick={handleFinalSubmit}
               disabled={!allAnswered || submitMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold px-8 py-2.5 rounded-lg text-sm transition"
+              className="bg-sky-600 hover:bg-sky-700 disabled:opacity-60 text-white font-semibold px-8 py-2.5 rounded-lg text-sm transition"
             >
               {submitMutation.isPending ? 'Submitting…' : 'Submit & See Results'}
             </button>
@@ -480,7 +480,7 @@ export default function EmployeeTrainingDetail() {
           </p>
           <button
             onClick={handleRetake}
-            className="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-8 py-2.5 rounded-lg text-sm font-medium transition"
+            className="mt-8 bg-sky-600 hover:bg-sky-700 text-white px-8 py-2.5 rounded-lg text-sm font-medium transition"
           >
             Retake Training
           </button>

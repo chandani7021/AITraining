@@ -5,6 +5,7 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import Login from './pages/Login'
 import AdminDocuments from './pages/admin/Documents'
 import AdminTrainingDetail from './pages/admin/TrainingDetail'
+import AdminUsers from './pages/admin/Users'
 import EmployeeTrainings from './pages/employee/Trainings'
 import EmployeeTrainingDetail from './pages/employee/TrainingDetail'
 
@@ -35,6 +36,15 @@ export default function App() {
         element={
           <ProtectedRoute role="admin">
             <AdminTrainingDetail />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute role="admin">
+            <AdminUsers />
           </ProtectedRoute>
         }
       />

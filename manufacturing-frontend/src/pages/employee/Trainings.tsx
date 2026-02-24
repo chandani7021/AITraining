@@ -55,7 +55,7 @@ export default function EmployeeTrainings() {
           <Link
             key={t.training_id}
             to={`/employee/trainings/${t.training_id}`}
-            className="block bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:border-blue-400 hover:shadow-md transition"
+            className="block bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:border-sky-400 hover:shadow-md transition"
           >
             <div className="flex items-start justify-between gap-2 mb-3">
               <h3 className="font-semibold text-gray-900 leading-snug">{t.title}</h3>
@@ -64,7 +64,7 @@ export default function EmployeeTrainings() {
             <p className="text-xs text-gray-400">
               Assigned {new Date(t.assigned_at).toLocaleDateString()}
             </p>
-            <p className="mt-3 text-sm text-blue-600 font-medium">
+            <p className="mt-3 text-sm text-sky-600 font-medium">
               {t.completed ? 'Review training →' : 'Start training →'}
             </p>
           </Link>
