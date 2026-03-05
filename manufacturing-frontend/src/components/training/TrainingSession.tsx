@@ -204,7 +204,7 @@ export function TrainingSession({
              
              
                 <p className="text-sm text-sky-700">
-                  <strong>Notes:</strong> Test your knowledge. (Practice round — answers shown immediately)
+                  <strong>Notes:</strong> Practice round — answers shown immediately
                 </p>
             
             </div>
