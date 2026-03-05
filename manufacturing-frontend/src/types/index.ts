@@ -101,6 +101,7 @@ export interface EmployeeTrainingItem {
 export interface ProgressInfo {
   completed: boolean;
   score: number | null;
+  current_module_index: number | null;
 }
 
 export interface EmployeeTrainingDetail {

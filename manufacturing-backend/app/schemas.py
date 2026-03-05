@@ -111,6 +111,11 @@ class EmployeeTrainingItem(BaseModel):
 class ProgressInfo(BaseModel):
     completed: bool
     score: Optional[int]
+    current_module_index: Optional[int] = None
+
+
+class SaveProgressRequest(BaseModel):
+    current_module_index: int
 
 
 class EmployeeTrainingDetail(BaseModel):

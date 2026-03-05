@@ -3,7 +3,8 @@ import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api/client';
 import { Layout } from '../../components/Layout';
-import type { TrainingOut, EmployeeListItem, ContentBlock } from '../../types';
+import { ContentRenderer } from '../../components/training/ContentRenderer';
+import type { TrainingOut, EmployeeListItem } from '../../types';
 
 // ---------------------------------------------------------------------------
 // API calls
@@ -21,26 +22,6 @@ async function fetchEmployees(): Promise<EmployeeListItem[]> {
 
 async function assignTraining(trainingId: string, userIds: number[]) {
   await apiClient.post(`/admin/trainings/${trainingId}/assign`, { user_ids: userIds });
-}
-
-// ---------------------------------------------------------------------------
-// Content renderer
-// ---------------------------------------------------------------------------
-
-function ContentRenderer({ block }: { block: ContentBlock }) {
-  if (block.type === 'paragraph') {
-    return <p className="text-gray-700 text-sm leading-relaxed">{block.text}</p>;
-  }
-  if (block.type === 'bullet_list') {
-    return (
-      <ul className="list-disc list-inside text-gray-700 text-sm space-y-1">
-        {block.items.map((item, i) => (
-          <li key={i}>{item}</li>
-        ))}
-      </ul>
-    );
-  }
-  return null;
 }
 
 // ---------------------------------------------------------------------------

@@ -78,6 +78,7 @@ class Progress(Base):
     score = Column(Integer, nullable=True)
     completed = Column(Boolean, default=False)
     completed_at = Column(DateTime, nullable=True)
+    current_module_index = Column(Integer, nullable=True)  # last module the employee was on
 
     __table_args__ = (UniqueConstraint("user_id", "training_id", name="uq_progress"),)
 

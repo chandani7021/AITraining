@@ -1,46 +1,41 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../../api/client';
-import { Layout } from '../../components/Layout';
-import { ContentRenderer } from '../../components/training/ContentRenderer';
-import { QuizSection } from '../../components/training/QuizSection';
-import { StepIndicator } from '../../components/training/StepIndicator';
-import type { Stage } from '../../components/training/types';
+import { Layout } from '../Layout';
+import { ContentRenderer } from './ContentRenderer';
+import { QuizSection } from './QuizSection';
+import { StepIndicator } from './StepIndicator';
+import type { Stage } from './types';
 import type { EmployeeTrainingDetail, QuizAnswer, QuizResult } from '../../types';
-
-// ---------------------------------------------------------------------------
-// API calls
-// ---------------------------------------------------------------------------
-
-async function fetchTraining(id: string): Promise<EmployeeTrainingDetail> {
-  const { data } = await apiClient.get(`/employee/trainings/${id}`);
-  return data;
-}
 
 async function submitQuiz(id: string, answers: QuizAnswer[]): Promise<QuizResult> {
   const { data } = await apiClient.post(`/employee/trainings/${id}/submit-quiz`, { answers });
   return data;
 }
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
-
-export default function TrainingDetail() {
-  const { id } = useParams<{ id: string }>();
+export function TrainingSession({
+  training,
+  trainingId,
+}: {
+  training: EmployeeTrainingDetail;
+  trainingId: string;
+}) {
   const qc = useQueryClient();
   const navigate = useNavigate();
+  const storageKey = `mfg-training-${trainingId}`;
 
-  const storageKey = `mfg-training-${id}`;
-
-  // stageState: initialized from localStorage; null means "not yet set by user interaction"
-  const [stageState, setStage] = useState<Stage | null>(() => {
+  const [stage, setStage] = useState<Stage>(() => {
+    // 1. Try localStorage (fast, same device)
     try {
       const saved = localStorage.getItem(storageKey);
-      if (saved) return JSON.parse(saved).stage ?? null;
+      if (saved) return JSON.parse(saved).stage ?? { type: 'module-content', index: 0 };
     } catch { /* ignore */ }
-    return null;
+    // 2. Fall back to backend-persisted index (cross-device resume)
+    if (training.progress.current_module_index != null) {
+      return { type: 'module-content', index: training.progress.current_module_index };
+    }
+    return { type: 'module-content', index: 0 };
   });
 
   const [moduleAnswers, setModuleAnswers] = useState<Record<number, Record<string, number>>>(() => {
@@ -60,32 +55,14 @@ export default function TrainingDetail() {
   const [finalAnswers, setFinalAnswers] = useState<Record<string, number>>({});
   const [result, setResult] = useState<QuizResult | null>(null);
 
-  const { data: training, isLoading } = useQuery({
-    queryKey: ['employee', 'training', id],
-    queryFn: () => fetchTraining(id ?? ''),
-    enabled: !!id,
-  });
-
-  // Derived stage: localStorage → backend → default module 0
-  // Computing during render means no setStage-in-effect needed
-  const backendModuleIndex = training?.progress.current_module_index ?? null;
-  const stage = useMemo<Stage>(() => {
-    if (stageState !== null) return stageState;
-    if (backendModuleIndex != null) {
-      return { type: 'module-content', index: backendModuleIndex };
-    }
-    return { type: 'module-content', index: 0 };
-  }, [stageState, backendModuleIndex]);
-
-  // Persist to localStorage only after user has interacted (stageState is non-null)
+  // Persist to localStorage immediately on every change
   useEffect(() => {
-    if (stageState === null) return;
     if (stage.type === 'result') {
       localStorage.removeItem(storageKey);
     } else {
       localStorage.setItem(storageKey, JSON.stringify({ stage, moduleAnswers, moduleChecked }));
     }
-  }, [stage, moduleAnswers, moduleChecked, storageKey, stageState]);
+  }, [stage, moduleAnswers, moduleChecked, storageKey]);
 
   // Debounced save to backend — fires 1.5s after the last stage change
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -94,21 +71,21 @@ export default function TrainingDetail() {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       apiClient
-        .patch(`/employee/trainings/${id}/progress`, { current_module_index: stage.index })
+        .patch(`/employee/trainings/${trainingId}/progress`, { current_module_index: stage.index })
         .catch(() => {});
     }, 1500);
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [stage, id]);
+  }, [stage, trainingId]);
 
   const submitMutation = useMutation({
-    mutationFn: (payload: QuizAnswer[]) => submitQuiz(id ?? '', payload),
+    mutationFn: (payload: QuizAnswer[]) => submitQuiz(trainingId, payload),
     onSuccess: (data) => {
       setResult(data);
       setStage({ type: 'result' });
       qc.invalidateQueries({ queryKey: ['employee', 'trainings'] });
-      qc.invalidateQueries({ queryKey: ['employee', 'training', id] });
+      qc.invalidateQueries({ queryKey: ['employee', 'training', trainingId] });
     },
   });
 
@@ -119,22 +96,6 @@ export default function TrainingDetail() {
     setModuleChecked({});
     setFinalAnswers({});
     setResult(null);
-  }
-
-  if (isLoading) {
-    return (
-      <Layout>
-        <p className="text-gray-500 text-sm">Loading training…</p>
-      </Layout>
-    );
-  }
-
-  if (!training) {
-    return (
-      <Layout>
-        <p className="text-red-600 text-sm">Training not found or not assigned to you.</p>
-      </Layout>
-    );
   }
 
   const modules = training.modules?.modules ?? [];

@@ -1,8 +1,9 @@
 """
 Employee-only routes:
-  GET  /employee/trainings          – list assigned trainings
-  GET  /employee/trainings/{id}     – training detail + progress
-  POST /employee/trainings/{id}/submit-quiz – submit quiz answers
+  GET   /employee/trainings                        – list assigned trainings
+  GET   /employee/trainings/{id}                   – training detail + progress
+  PATCH /employee/trainings/{id}/progress          – save current module position
+  POST  /employee/trainings/{id}/submit-quiz       – submit quiz answers
 """
 from datetime import datetime
 
@@ -18,6 +19,7 @@ from ..schemas import (
     ProgressInfo,
     QuizResult,
     QuizSubmission,
+    SaveProgressRequest,
 )
 
 router = APIRouter(prefix="/employee", tags=["employee"])
@@ -98,8 +100,32 @@ def get_training_detail(
         progress=ProgressInfo(
             completed=prog.completed if prog else False,
             score=prog.score if prog else None,
+            current_module_index=prog.current_module_index if prog else None,
         ),
     )
+
+
+@router.patch("/trainings/{training_id}/progress", status_code=status.HTTP_204_NO_CONTENT)
+def save_progress(
+    training_id: int,
+    payload: SaveProgressRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_employee),
+):
+    _get_assignment_or_404(training_id, current_user.id, db)
+
+    prog = _get_progress(training_id, current_user.id, db)
+    if prog:
+        prog.current_module_index = payload.current_module_index
+    else:
+        prog = Progress(
+            user_id=current_user.id,
+            training_id=training_id,
+            current_module_index=payload.current_module_index,
+        )
+        db.add(prog)
+
+    db.commit()
 
 
 @router.post("/trainings/{training_id}/submit-quiz", response_model=QuizResult)
@@ -142,6 +168,7 @@ def submit_quiz(
         prog.score = score
         prog.completed = passed
         prog.completed_at = datetime.utcnow() if passed else None
+        prog.current_module_index = None  # clear resume point on completion
     else:
         prog = Progress(
             user_id=current_user.id,
