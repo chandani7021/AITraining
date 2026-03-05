@@ -142,11 +142,20 @@ def submit_quiz(
         raise HTTPException(status_code=404, detail="Training not found")
 
     # Build lookup: question_id → correct_index
-    modules_data = training.modules  # dict with "modules" key
+    # The training modules field contains both "modules" and "final_quiz"
+    training_data = training.modules
     correct_map: dict[str, int] = {}
-    for mod in modules_data.get("modules", []):
-        for q in mod.get("quiz", {}).get("questions", []):
-            correct_map[q["id"]] = q["correct_index"]
+
+    # Previously scored all module questions; now scoring only final_quiz questions
+    final_quiz = training_data.get("final_quiz", {})
+    for q in final_quiz.get("questions", []):
+        correct_map[q["id"]] = q["correct_index"]
+
+    if not correct_map:
+        # Fallback if final_quiz is missing (old data)
+        for mod in training_data.get("modules", []):
+            for q in mod.get("quiz", {}).get("questions", []):
+                correct_map[q["id"]] = q["correct_index"]
 
     if not correct_map:
         raise HTTPException(status_code=422, detail="No questions found in this training")
