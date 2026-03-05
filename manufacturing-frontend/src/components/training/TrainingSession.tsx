@@ -229,7 +229,7 @@ export function TrainingSession({
                   type="button"
                   onClick={() => setModuleChecked((prev) => ({ ...prev, [stage.index]: true }))}
                   disabled={!allAnswered}
-                  className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-medium transition"
+                  className=" bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-medium transition"
                 >
                   Check Answers
                 </button>

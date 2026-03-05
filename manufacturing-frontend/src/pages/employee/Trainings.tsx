@@ -44,7 +44,9 @@ export default function EmployeeTrainings() {
               Assigned {new Date(t.assigned_at).toLocaleDateString()}
             </p>
             <p className="mt-3 text-sm text-sky-600 font-medium">
-              {t.completed ? 'Review training →' : 'Start training →'}
+              {t.completed || t.score !== null
+                ? 'Restart training →'
+                : 'Start training →'}
             </p>
           </Link>
         ))}

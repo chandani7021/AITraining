@@ -30,7 +30,8 @@ PROMPT_TEMPLATE = textwrap.dedent("""
 You are a manufacturing training expert and instructional designer.
 
 Your task is to read the following Standard Operating Procedure (SOP) text and
-produce a structured training program with a multiple-choice quiz.
+produce a structured training program with per-module practice quizzes and a
+separate scored final quiz.
 
 --- SOP TEXT START ---
 {sop_text}
@@ -61,20 +62,34 @@ no extra keys, JSON only):
           {{
             "id": "q1",
             "question": "<question text>",
-            "options": ["<option A>", "<option B>", "<option C>", "<option D>"],
+            "options": ["<option A>", "<option B>", "<option C>"],
             "correct_index": 0,
             "explanation": "<why this answer is correct>"
           }}
         ]
       }}
     }}
-  ]
+  ],
+  "final_quiz": {{
+    "questions": [
+      {{
+        "id": "fq1",
+        "question": "<question text — must be different from all module quiz questions>",
+        "options": ["<option A>", "<option B>", "<option C>"],
+        "correct_index": 0,
+        "explanation": "<why this answer is correct>"
+      }}
+    ]
+  }}
 }}
 
 Rules:
 - Create 2-4 modules covering different sections of the SOP.
-- Each module must have at least 2 quiz questions with exactly 3 answer options.
-- Use stable, sequential IDs: module-1, module-2, … and q1, q2, q3, … (global across all modules).
+- Each module must have at least 2 practice quiz questions with exactly 3 answer options.
+- Use IDs module-1, module-2, … and q1, q2, q3, … (global across all modules) for module questions.
+- final_quiz must contain exactly 5-6 questions that cover key concepts from ALL modules.
+- final_quiz questions must be completely different from any module quiz question — no reuse, no rephrasing.
+- Use IDs fq1, fq2, fq3, … for final_quiz questions.
 - correct_index is 0-based (0 = first option).
 - content must have a mix of "paragraph" and "bullet_list" blocks.
 - Respond with valid JSON only — no markdown fences, no comments.
@@ -141,6 +156,12 @@ def _validate_training_json(data: dict) -> None:
             for key in ("id", "question", "options", "correct_index"):
                 if key not in q:
                     raise ValueError(f"Question missing key: {key}")
+    if "final_quiz" not in data or "questions" not in data["final_quiz"]:
+        raise ValueError("Missing 'final_quiz' in generated JSON")
+    for q in data["final_quiz"]["questions"]:
+        for key in ("id", "question", "options", "correct_index"):
+            if key not in q:
+                raise ValueError(f"Final quiz question missing key: {key}")
 
 
 # ---------------------------------------------------------------------------
@@ -155,6 +176,11 @@ def _shuffle_options(data: dict) -> dict:
             correct_answer = options[q["correct_index"]]
             random.shuffle(options)
             q["correct_index"] = options.index(correct_answer)
+    for q in data.get("final_quiz", {}).get("questions", []):
+        options = q["options"]
+        correct_answer = options[q["correct_index"]]
+        random.shuffle(options)
+        q["correct_index"] = options.index(correct_answer)
     return data
 
 

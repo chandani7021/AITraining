@@ -138,7 +138,10 @@ export default function TrainingDetail() {
   }
 
   const modules = training.modules?.modules ?? [];
-  const allQuestions = modules.flatMap((m) => m.quiz.questions);
+
+  const finalQuizQuestions = training.modules?.final_quiz?.questions?.length
+    ? training.modules.final_quiz.questions
+    : modules.flatMap((m) => m.quiz.questions);
 
   // ------------------------------------------------------------------
   // Module content screen
@@ -268,7 +271,7 @@ export default function TrainingDetail() {
                   type="button"
                   onClick={() => setModuleChecked((prev) => ({ ...prev, [stage.index]: true }))}
                   disabled={!allAnswered}
-                  className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-medium transition"
+                  className=" bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white px-5 py-2 rounded-lg text-sm font-medium transition"
                 >
                   Check Answers
                 </button>
@@ -321,7 +324,7 @@ export default function TrainingDetail() {
   // Final quiz screen
   // ------------------------------------------------------------------
   if (stage.type === 'final-quiz') {
-    const allAnswered = allQuestions.every((q) => finalAnswers[q.id] !== undefined);
+    const allAnswered = finalQuizQuestions.every((q) => finalAnswers[q.id] !== undefined);
 
     function handleFinalSubmit() {
       const payload: QuizAnswer[] = Object.entries(finalAnswers).map(([qid, idx]) => ({
@@ -342,11 +345,11 @@ export default function TrainingDetail() {
             <h4 className="font-bold text-gray-900 text-lg">Final Quiz</h4>
           </div>
           <p className="text-xs text-gray-400 mb-6">
-            {allQuestions.length} questions across all {modules.length} modules · This is scored
+            {finalQuizQuestions.length} questions across all {modules.length} modules · This is scored
           </p>
 
           <QuizSection
-            questions={allQuestions}
+            questions={finalQuizQuestions}
             answers={finalAnswers}
             onSelect={(qid, idx) => setFinalAnswers((prev) => ({ ...prev, [qid]: idx }))}
             checked={false}
@@ -362,7 +365,7 @@ export default function TrainingDetail() {
             </button>
             <div className="flex items-center gap-3">
               <p className="text-xs text-gray-400">
-                {Object.keys(finalAnswers).length} / {allQuestions.length} answered
+                {Object.keys(finalAnswers).length} / {finalQuizQuestions.length} answered
               </p>
               <button
                 type="button"
@@ -406,13 +409,22 @@ export default function TrainingDetail() {
               ? 'You have successfully completed this training.'
               : 'Review the modules and try again to improve your score.'}
           </p>
-          <button
-            type="button"
-            onClick={handleRetake}
-            className="mt-8 bg-sky-600 hover:bg-sky-700 text-white px-8 py-2.5 rounded-lg text-sm font-medium transition"
-          >
-            Retake Training
-          </button>
+          <div className="mt-8 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={handleRetake}
+              className="bg-sky-600 hover:bg-sky-700 text-white px-8 py-2.5 rounded-lg text-sm font-medium transition"
+            >
+              Retake Training
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/employee/trainings')}
+              className="border border-gray-300 hover:border-gray-400 text-gray-600 hover:text-gray-800 px-8 py-2.5 rounded-lg text-sm font-medium transition"
+            >
+              Back to Dashboard
+            </button>
+          </div>
         </div>
       </Layout>
     );

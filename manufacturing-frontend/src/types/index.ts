@@ -71,6 +71,7 @@ export interface Module {
 
 export interface ModulesJSON {
   modules: Module[];
+  final_quiz?: { questions: QuizQuestion[] };
 }
 
 // ---------------------------------------------------------------------------
@@ -96,6 +97,7 @@ export interface EmployeeTrainingItem {
   assigned_at: string;
   completed: boolean;
   score: number | null;
+  current_module_index: number | null;
 }
 
 export interface ProgressInfo {
